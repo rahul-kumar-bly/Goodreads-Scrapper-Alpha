@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+import undetected_chromedriver as uc
 
 # import libraries end
 # ################################################
@@ -13,11 +14,9 @@ class GoodreadAPI():
     def __init__(self, email, password):
         self.email = email
         self.password = password
-    s = Service("chromedriver.exe")
-    opts = Options()
-    opts.headless = True
-    browser = webdriver.Chrome(options=opts,service=s)
-    # browser = webdriver.Chrome(service=s)
+    options = uc.ChromeOptions()
+    options.add_argument("--headless")
+    browser = uc.Chrome(options=options)
     browser.get('https://www.goodreads.com/user/sign_in')
     # ################################################
 
