@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import undetected_chromedriver as uc
+from time import sleep
 
 # import libraries end
 # ################################################
@@ -15,7 +16,7 @@ class GoodreadAPI():
         self.email = email
         self.password = password
     options = uc.ChromeOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     browser = uc.Chrome(options=options)
     browser.get('https://www.goodreads.com/user/sign_in')
     # ################################################
@@ -23,8 +24,11 @@ class GoodreadAPI():
         # ################################################
         # Login Information
     def login(self):
-        log_email = self.browser.find_element(By.ID, value="user_email")
-        log_pwd = self.browser.find_element(By.ID, value="user_password")
+        login_with_email_button = self.browser.find_element(By.CSS_SELECTOR, value=".authPortalConnectButton.authPortalSignInButton")
+        login_with_email_button.click()
+        sleep(2)
+        log_email = self.browser.find_element(By.ID, value="ap_email")
+        log_pwd = self.browser.find_element(By.ID, value="ap_password")
         log_email.send_keys(self.email)
         log_pwd.send_keys(self.password)
         log_pwd.submit()

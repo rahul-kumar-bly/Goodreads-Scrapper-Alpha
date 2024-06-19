@@ -1,4 +1,3 @@
-
 import goodread
 import pandas as pd
 from random import randint
@@ -10,9 +9,9 @@ WELCOME_STRING = """Please let me know your prefered action.
 1.Search a book
 2.Show all categories
 Your input ===> """
-SAVE_FILE = "Save it as Excel file? (y/n) ===> "
+SAVE_FILE = "Save it as CSV file? (y/n) ===> "
 DONT_SAVE = "Thanks for using this tool!"
-XL_FILE = str(randint(888,9999999)) + ".xlsx"
+XL_FILE = str(randint(888,9999999)) + ".csv"
 SEARCH_STRING = """Enter a book name to search, spelling must be correct. 
 ===> """
 SELECT_A_LINK = "Select a particular link ===> "
@@ -28,7 +27,7 @@ def print_save_df(list_link):
     print(df)
     save_to_ = input(SAVE_FILE)
     if save_to_ == "y":
-        df.to_excel(XL_FILE)
+        df.to_csv(XL_FILE)
     else:
         print(DONT_SAVE)
 
