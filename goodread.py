@@ -9,6 +9,8 @@ from time import sleep
 import re
 import requests
 from bs4 import BeautifulSoup
+import json
+from pathlib import Path
 
 # import libraries end
 # ################################################
@@ -23,7 +25,7 @@ class GoodreadAPI():
     browser = uc.Chrome(options=options)
     browser.get('https://www.goodreads.com/user/sign_in')
     # ################################################
-
+        
         # ################################################
         # Login Information
     def login(self):
@@ -44,24 +46,21 @@ class GoodreadAPI():
     def createDataFrame(self, search_response):
         soup = BeautifulSoup(search_response, 'html.parser')
         items_list = soup.find_all('tr', {'itemtype': 'http://schema.org/Book'})
-        print(f"length of items_list is {len(items_list)}")
         book_list_ap = [{} for _ in range(len(items_list))]
 
         for i in range(0,len(items_list)):
-            # use this to fetch avg rating, total ratings and published date -> book_list[i][2]
             rating_string = items_list[i].find('span', {'class', 'greyText smallText uitext'}).text.strip().replace('\n', '')
-            print(f'rating_string is {rating_string}')
             avg_rating_match = re.search(r"(\d+\.\d+) avg rating",rating_string)
             total_ratings_match = re.search(r"(\d{1,3}(?:,\d{3})*) ratings", rating_string)
             published_date_match = re.search(r"published\s+(\d{4})", rating_string)
 
             avg_rating = avg_rating_match.group(1) if avg_rating_match else None
-            print(f'avg_rating is {avg_rating}')
             total_ratings = total_ratings_match.group(1) if total_ratings_match else None
             published_date = published_date_match.group(1) if published_date_match else None
 
             book_list_ap[i] = {
                 'title': items_list[i].find('a', title=True)['title'],
+                'url': items_list[i].find('a', {'class': 'bookTitle'})['href'],
                 'author': items_list[i].find('a', {'class': 'authorName'}).text.strip(),
                 'published_date': published_date,
                 'avg_rating':avg_rating,
@@ -69,11 +68,23 @@ class GoodreadAPI():
                 'cover_img': items_list[i].find('img', {'class': 'bookCover'})['src']
             }
 
-        print(book_list_ap)
+        self.export_to_json(book_list_ap)
         return book_list_ap
     # This will create dataframe Ends
     # ################################################
 
+    def export_to_json(self, book_list_ap):
+        '''Export the book_list_ap to '''
+        db_file = Path("db.json")
+        if db_file.is_file():
+            with open('db.json', 'r+') as json_file:
+                data = json.load(json_file)
+                data.extend(book_list_ap)
+                json_file.seek(0)
+                json.dump(data, json_file, indent=4)
+        else:
+            with open('db.json', 'w') as json_file:
+                json.dump(book_list_ap, json_file, indent=4) 
 
     # ################################################
     # This will create a list of tags
